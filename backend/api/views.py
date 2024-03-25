@@ -25,3 +25,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class DiscountViewSet(viewsets.ModelViewSet):
+    """Вьюсет для отображения распродаж."""
+
+    queryset = Item.objects.filter(is_discount=True, discount_price__gt=0)
+    serializer_class = ItemsSerializer
+
+
+class SpecialOfferViewSet(viewsets.ModelViewSet):
+    """Вьюсет специальных предложений."""
+
+    queryset = Item.objects.filter(is_special_offer=True)
+    serializer_class = ItemsSerializer

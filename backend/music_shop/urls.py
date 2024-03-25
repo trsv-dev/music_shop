@@ -4,13 +4,16 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import ItemsViewSet, BlogViewSet, CategoryViewSet
+from api.views import (ItemsViewSet, BlogViewSet, CategoryViewSet,
+                       DiscountViewSet, SpecialOfferViewSet)
 
 router = routers.DefaultRouter()
 
 router.register('items', ItemsViewSet, basename='items')
 router.register('blog', BlogViewSet, basename='blog')
 router.register('categories', CategoryViewSet, basename='categories')
+router.register('discount', DiscountViewSet, basename='discount')
+router.register('special_offer', SpecialOfferViewSet, basename='special_offer')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

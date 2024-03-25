@@ -11,8 +11,9 @@ class ItemsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'name', 'description', 'short_description',
-                  'category', 'tags', 'image', 'price',
-                  'promo_price', 'add_date', 'is_published', 'is_on_main']
+                  'category', 'tags', 'image', 'is_special_offer', 'price',
+                  'is_discount', 'discount_price', 'add_date', 'is_published',
+                  'is_on_main']
 
 
 class BlogSerializer(serializers.ModelSerializer):

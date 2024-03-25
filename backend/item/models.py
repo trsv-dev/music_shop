@@ -47,13 +47,34 @@ class Item(models.Model):
         verbose_name='Изображение',
         help_text='Загрузите изображение'
     )
+    is_special_offer = models.BooleanField(
+        blank=True,
+        null=True,
+        verbose_name='Уникальное предложение?',
+        help_text='Лимитированная серия? / уникальное предложение?',
+        choices=(
+            (True, 'Да'),
+            (False, 'Нет')
+        )
+    )
     price = models.IntegerField(
         blank=False,
         null=False,
         verbose_name='Цена без акции',
         help_text='Введите цену без акции'
     )
-    promo_price = models.IntegerField(
+    is_discount = models.BooleanField(
+        blank=True,
+        null=True,
+        verbose_name='Распродажа?',
+        help_text='Участвует в распродаже?',
+        choices=(
+            (True, 'Да'),
+            (False, 'Нет')
+        )
+    )
+    discount_price = models.IntegerField(
+        default=0,
         blank=True,
         null=True,
         verbose_name='Акционная цена',

@@ -14,9 +14,9 @@ class ItemAdmin(admin.ModelAdmin):
     """Класс администрирования товаров."""
 
     list_display = ('id', 'name', 'show_description', 'short_description',
-                    'category', 'show_tags', 'show_image', 'show_price',
-                    'show_promo_price', 'add_date', 'is_published',
-                    'is_on_main')
+                    'category', 'show_tags', 'show_image', 'is_special_offer',
+                    'show_price', 'is_discount', 'show_discount_price',
+                    'add_date', 'is_published', 'is_on_main')
     ordering = ('-add_date',)
     search_fields = ('name', 'description')
     list_per_page = 25
@@ -39,10 +39,10 @@ class ItemAdmin(admin.ModelAdmin):
 
     show_price.short_description = 'Цена без акции'
 
-    def show_promo_price(self, obj):
-        return f'{obj.promo_price:,} руб.'
+    def show_discount_price(self, obj):
+        return f'{obj.discount_price:,} руб.' if obj.discount_price else f'{0} руб.'
 
-    show_promo_price.short_description = 'Цена по акции'
+    show_discount_price.short_description = 'Цена по акции'
 
     def show_image(self, obj):
         if obj.image:

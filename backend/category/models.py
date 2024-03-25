@@ -15,6 +15,7 @@ class Category(models.Model):
     slug = models.CharField(
         max_length=100,
         unique=True,
+        null=False,
         blank=False,
         validators=(
             RegexValidator(

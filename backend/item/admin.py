@@ -1,9 +1,12 @@
-from django.contrib import admin
 from django.conf import settings
+from django.contrib import admin
 from django.utils.html import format_html
-from django.apps import apps
 
 from item.models import Item
+
+admin.site.site_header = "Магазин музыкальных инструментов"
+admin.site.site_title = "Панель администрирования"
+admin.site.index_title = "Добро пожаловать магазин музыкальных инструментов!"
 
 
 @admin.register(Item)

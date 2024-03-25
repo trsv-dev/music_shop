@@ -13,6 +13,7 @@ class Tags(models.Model):
     slug = models.CharField(
         max_length=100,
         unique=True,
+        null=False,
         blank=False,
         validators=(
             RegexValidator(
@@ -24,8 +25,8 @@ class Tags(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Создать тег'
-        verbose_name_plural = 'Создать теги'
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
 
     def __str__(self):
         return self.name
@@ -34,10 +35,8 @@ class Tags(models.Model):
 class ItemTag(models.Model):
     """Модель для сопоставления товаров и тегов."""
 
-    item_model_name = 'item.Item'
-
     item = models.ForeignKey(
-        item_model_name,
+        'item.Item',
         on_delete=models.CASCADE,
         related_name='item_tags',
         verbose_name='Товар',

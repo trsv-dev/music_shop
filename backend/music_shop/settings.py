@@ -41,7 +41,8 @@ INSTALLED_APPS = [
 
     'item.apps.ItemConfig',
     'category.apps.CategoryConfig',
-    'tags.apps.TagsConfig'
+    'tags.apps.TagsConfig',
+    'blog.apps.BlogConfig',
 ]
 
 MIDDLEWARE = [
@@ -90,7 +91,9 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
 
 # Password validation
@@ -143,3 +146,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DESCRIPTION_LENGHT = 150
+BLOG_TEXT_LENGHT = 150

@@ -6,8 +6,6 @@ from category.models import Category
 class Item(models.Model):
     """Модель товара."""
 
-    tags_model_name = 'tags.Tags'
-
     name = models.CharField(
         max_length=255,
         blank=False,
@@ -23,6 +21,8 @@ class Item(models.Model):
         help_text='Введите краткое описание товара'
     )
     description = models.TextField(
+        null=False,
+        blank=False,
         verbose_name='Описание',
         help_text='Введите описание товара'
     )
@@ -30,12 +30,13 @@ class Item(models.Model):
         Category,
         null=False,
         blank=False,
+        related_name='items',
         on_delete=models.CASCADE,
         verbose_name='Категория',
         help_text='Выберите категорию товара'
     )
     tags = models.ManyToManyField(
-        tags_model_name,
+        'tags.Tags',
         related_name='items',
         verbose_name='Теги'
     )

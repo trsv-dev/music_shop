@@ -4,7 +4,13 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
+from api.views import ItemsViewSet, BlogViewSet, CategoryViewSet
+
 router = routers.DefaultRouter()
+
+router.register('items', ItemsViewSet, basename='items')
+router.register('blog', BlogViewSet, basename='blog')
+router.register('categories', CategoryViewSet, basename='categories')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

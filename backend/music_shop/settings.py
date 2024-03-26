@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
 
 # Application definition
 
@@ -37,12 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
+    'debug_toolbar',
 
     'item.apps.ItemConfig',
     'category.apps.CategoryConfig',
     'tags.apps.TagsConfig',
     'blog.apps.BlogConfig',
+    'order.apps.OrderConfig'
 ]
 
 MIDDLEWARE = [
@@ -53,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'music_shop.urls'
@@ -147,3 +155,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DESCRIPTION_LENGHT = 150
 BLOG_TEXT_LENGHT = 150
+ORDER_NOTES_LENGHT = 50
+
+CART_SESSION_ID = 'cart'

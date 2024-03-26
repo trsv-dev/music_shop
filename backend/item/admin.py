@@ -38,11 +38,13 @@ class ItemAdmin(admin.ModelAdmin):
         return f'{obj.price:,} руб.'
 
     show_price.short_description = 'Цена без акции'
+    show_price.admin_order_field = 'price'
 
     def show_discount_price(self, obj):
         return f'{obj.discount_price:,} руб.' if obj.discount_price else f'{0} руб.'
 
     show_discount_price.short_description = 'Цена по акции'
+    show_discount_price.admin_order_field = 'discount_price'
 
     def show_image(self, obj):
         if obj.image:

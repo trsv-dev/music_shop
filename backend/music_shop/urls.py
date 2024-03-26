@@ -6,6 +6,7 @@ from rest_framework import routers
 
 from api.views import (ItemsViewSet, BlogViewSet, CategoryViewSet,
                        DiscountViewSet, SpecialOfferViewSet)
+# from cart.views import CartAPI
 
 router = routers.DefaultRouter()
 
@@ -18,7 +19,9 @@ router.register('special_offer', SpecialOfferViewSet, basename='special_offer')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls'))
+    path('api-auth/', include('rest_framework.urls')),
+    # path('api/v1/cart/', CartAPI.as_view(), name='cart'),
+    path('__debug__/', include('debug_toolbar.urls')),
 ]
 
 if settings.DEBUG:

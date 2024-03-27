@@ -22,6 +22,8 @@ class ItemAdmin(admin.ModelAdmin):
     list_per_page = 25
 
     def show_description(self, obj):
+        """Отображение укороченного описания товара."""
+
         return obj.description if (len(obj.description) <
                                    settings.DESCRIPTION_LENGHT) else (
                 obj.description[:settings.DESCRIPTION_LENGHT] + '...')
@@ -29,24 +31,32 @@ class ItemAdmin(admin.ModelAdmin):
     show_description.short_description = 'Описание'
 
     def show_tags(self, obj):
+        """Отображение тегов товара."""
+
         tag_names = [tag.name for tag in obj.tags.filter(items=obj)]
         return tag_names
 
     show_tags.short_description = 'Теги'
 
     def show_price(self, obj):
+        """Отображение цены с разделителями."""
+
         return f'{obj.price:,} руб.'
 
     show_price.short_description = 'Цена без акции'
     show_price.admin_order_field = 'price'
 
     def show_discount_price(self, obj):
+        """Отображение акционной цены с разделителями."""
+
         return f'{obj.discount_price:,} руб.' if obj.discount_price else f'{0} руб.'
 
     show_discount_price.short_description = 'Цена по акции'
     show_discount_price.admin_order_field = 'discount_price'
 
     def show_image(self, obj):
+        """Отображение изображения товара."""
+
         if obj.image:
             return format_html(
                 '<img src="{}" style="max-width: 50px; max-height: 50px; '

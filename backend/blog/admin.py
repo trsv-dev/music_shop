@@ -15,6 +15,8 @@ class BlogAdmin(admin.ModelAdmin):
     list_per_page = 25
 
     def show_text(self, obj):
+        """Отображение укороченного текста записи."""
+
         return obj.text if (len(obj.text) <
                             settings.BLOG_TEXT_LENGHT) else (
                 obj.text[:settings.BLOG_TEXT_LENGHT] + '...')

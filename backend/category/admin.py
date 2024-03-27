@@ -15,6 +15,8 @@ class CategoryAdmin(admin.ModelAdmin):
     list_per_page = 25
 
     def show_image(self, obj):
+        """Отображение изображения категории."""
+
         if obj.image:
             return format_html(
                 '<img src="{}" style="max-width: 50px; max-height: 50px; '

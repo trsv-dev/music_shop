@@ -80,7 +80,7 @@ class Item(models.Model):
         verbose_name='Акционная цена',
         help_text='Введите цену по акции'
     )
-    add_date = models.DateField(
+    add_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата и время добавления'
     )

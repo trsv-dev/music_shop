@@ -3,6 +3,7 @@ from rest_framework import serializers
 from blog.models import Blog
 from category.models import Category
 from item.models import Item
+from order.models import Order
 
 
 class ItemsSerializer(serializers.ModelSerializer):
@@ -30,3 +31,12 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['name', 'slug', 'short_description', 'image']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    """Сериализатор заказов."""
+
+    class Meta:
+        model = Order
+        fields = ['first_name', 'last_name', 'address', 'email',
+                  'communication_method', 'order_notes', ]

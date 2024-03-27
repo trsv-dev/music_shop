@@ -31,7 +31,7 @@ class Blog(models.Model):
         verbose_name='Текст записи',
         help_text='Введите текст записи в блоге'
     )
-    add_date = models.DateField(
+    add_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата и время добавления'
     )

@@ -6,6 +6,8 @@ from rest_framework import routers
 
 from api.views import (ItemsViewSet, BlogViewSet, CategoryViewSet,
                        DiscountViewSet, SpecialOfferViewSet)
+from order.views import CartView, AddToCartView, DeleteCartView
+
 # from cart.views import CartAPI
 
 router = routers.DefaultRouter()
@@ -21,6 +23,9 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     # path('api/v1/cart/', CartAPI.as_view(), name='cart'),
+    path('api/v1/cart/', CartView.as_view(), name='cart'),
+    path('api/v1/add_to_cart/', AddToCartView.as_view(), name='add_to_cart'),
+    path('api/v1/delete_cart/', DeleteCartView.as_view(), name='delete_cart'),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
 

@@ -11,6 +11,8 @@ from tags.models import ItemTag, Tags
 
 @admin.register(Tags)
 class TagsAdmin(admin.ModelAdmin):
+    """Класс администрирования тегов."""
+
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     list_per_page = 25

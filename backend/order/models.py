@@ -1,14 +1,16 @@
 import random
 import string
-import uuid
 
 from django.db import models
+
+from item.models import Item
 
 
 class Order(models.Model):
     """Модель заказов."""
 
     order_number = models.CharField(
+        default=0,
         max_length=10,
         editable=False,
         verbose_name='Идентификатор заказа'
@@ -50,6 +52,10 @@ class Order(models.Model):
         verbose_name='Способ связи',
         help_text='Укажите предпочтительный способ связи (необязательно)'
     )
+    items = models.ManyToManyField(
+        Item,
+        through='OrderItem',
+    )
     order_notes = models.TextField(
         max_length=1000,
         blank=True,
@@ -57,7 +63,7 @@ class Order(models.Model):
         verbose_name='Примечания к заказу',
         help_text='Напишите ваши дополнительные пожелания (необязательно)'
     )
-    created_date = models.DateField(
+    created_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата и время добавления'
     )
@@ -85,3 +91,33 @@ class Order(models.Model):
 
     def __str__(self):
         return str(self.order_number)
+
+
+class OrderItem(models.Model):
+    """Модель для связи товаров и заказа."""
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        verbose_name='Заказ',
+        help_text='Выберите заказ'
+    )
+    item = models.ForeignKey(
+        Item,
+        on_delete=models.CASCADE,
+        verbose_name='Товар',
+        help_text='Выберите товар'
+    )
+    quantity = models.PositiveIntegerField(
+        default=1,
+        verbose_name='Количество',
+        help_text='Введите количество'
+    )
+
+    class Meta:
+        unique_together = ['order', 'item']
+        verbose_name = 'Товар в заказе'
+        verbose_name_plural = 'Товары в заказе'
+
+    def __str__(self):
+        return f'Товар в заказе'

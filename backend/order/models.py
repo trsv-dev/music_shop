@@ -39,7 +39,6 @@ class Order(models.Model):
     )
     email = models.EmailField(
         max_length=254,
-        unique=True,
         blank=False,
         null=False,
         verbose_name='email',
@@ -90,7 +89,7 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return str(self.order_number)
+        return f'Заказ "{str(self.order_number)}"'
 
 
 class OrderItem(models.Model):

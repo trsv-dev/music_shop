@@ -66,7 +66,6 @@ class AddToCartSerializer(serializers.Serializer):
             raise serializers.ValidationError('Товар с таким идентификатором '
                                               'не найден')
 
-
         return item_id
 
     def validate_quantity(self, quantity):
@@ -95,4 +94,5 @@ class UpdateCartSerializer(AddToCartSerializer):
         if not isinstance(quantity, int):
             raise serializers.ValidationError('Количество товара должно быть '
                                               'целым числом')
+
         return quantity

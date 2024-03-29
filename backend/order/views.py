@@ -1,11 +1,13 @@
+from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializers import (ItemsSerializer, UpdateCartSerializer,
-                             AddToCartSerializer)
+                             AddToCartSerializer, OrderSerializer)
 from item.models import Item
+from order.models import Order, OrderItem
 
 
 class CartCheck:
@@ -160,3 +162,46 @@ class DeleteCartView(APIView):
 
         return Response({'message': 'Корзина пуста'},
                         status.HTTP_204_NO_CONTENT)
+
+
+class CheckoutView(APIView):
+    """Оформление заказа."""
+
+    permission_classes = [permissions.AllowAny]
+
+    @transaction.atomic
+    def post(self, request):
+        """POST-запрос для оформления заказа."""
+
+        if (not bool(request.session['cart']) and
+                not bool(CartCheck.clear_cart_from_zeroes_quantities(request))):
+            return Response({'error': 'Корзина пуста'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = OrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        order = Order(
+            first_name=serializer.validated_data.get('first_name'),
+            last_name=serializer.validated_data.get('last_name'),
+            address=serializer.validated_data.get('address'),
+            email=serializer.validated_data.get('email'),
+            communication_method=serializer.validated_data.get('communication_method'),
+            order_notes=serializer.validated_data.get('order_notes')
+        )
+        order.save()
+
+        for item_id, quantity in request.session['cart'].items():
+            item = get_object_or_404(Item, id=item_id)
+            order_item = OrderItem(
+                order=order,
+                item=item,
+                quantity=quantity
+            )
+            order_item.save()
+
+        request.session['cart'] = {}
+        request.session.modified = True
+
+        return Response({'message': 'Заказ успешно оформлен'},
+                        status.HTTP_201_CREATED)

@@ -7,6 +7,7 @@ from order.models import Order, OrderItem
 class ItemsInLine(admin.TabularInline):
     model = OrderItem
     extra = 0
+    ordering = ('id',)
     readonly_fields = ('price_per_item', 'price_for_all_items',)
 
     def price_for_all_items(self, obj):

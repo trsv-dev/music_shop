@@ -1,9 +1,13 @@
+import locale
 import random
 import string
 
+from django.conf import settings
 from django.db import models
 
 from item.models import Item
+
+locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
 
 
 class Order(models.Model):
@@ -89,7 +93,8 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return f'Заказ "{str(self.order_number)}"'
+        formatted_date = self.created_date.strftime("%d %B %Y г. %H:%M")
+        return f'Заказ "{str(self.order_number)}" от {formatted_date}'
 
 
 class OrderItem(models.Model):
@@ -119,4 +124,4 @@ class OrderItem(models.Model):
         verbose_name_plural = 'Товары в заказе'
 
     def __str__(self):
-        return f'Товар в заказе'
+        return f'{self.item.category}, количество: {self.quantity}'

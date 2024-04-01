@@ -11,24 +11,37 @@ from item.models import Item
 from order.models import Order, OrderItem
 
 
-class CartCheck:
+class CartChecker:
     """Класс проверок для корзины."""
 
-    @staticmethod
-    def check_for_unexisting_items_and_zeros_quantities(request):
+    def get_cart(self, request):
+        """Получение корзины."""
+
+        try:
+            cart = request.session['cart']
+            return cart
+        except KeyError:
+            raise SuspiciousOperation('Корзина не найдена')
+
+    def get_cart_items(self, request):
+        """Получение товаров, имеющий такой же id, как ключи корзины."""
+
+        cart = self.get_cart(request)
+
+        return Item.objects.filter(
+            id__in=cart.keys(), is_published=True
+        ).prefetch_related('tags').order_by('id')
+
+    def del_unexisting_items_and_zeros_quantities(self, request):
         """
         Очистка корзины от товаров с нулевым значением количества.
         Очистка от отсутствующих товаров.
         """
 
-        try:
-            cart = request.session['cart']
-        except KeyError:
-            raise SuspiciousOperation('Корзина не найдена')
+        cart = self.get_cart(request)
 
         # Проверяем, что все товары из корзины всё еще в БД. Сортируем по ID.
-        cart_items = Item.objects.filter(id__in=cart.keys()).order_by('id')
-
+        cart_items = self.get_cart_items(request)
         existing_non_zero_quantity_items = {}
 
         for item in cart_items:
@@ -39,10 +52,9 @@ class CartCheck:
         existing_non_zero_quantity_items = sorted(
             existing_non_zero_quantity_items.items(), key=lambda x: x[0]
         )
-
-        sorted_existing_non_zero_quantity_items = {key: value for key, value in existing_non_zero_quantity_items}
-
-        print('1', sorted_existing_non_zero_quantity_items)
+        sorted_existing_non_zero_quantity_items = {
+            key: value for key, value in existing_non_zero_quantity_items
+        }
 
         if len(sorted_existing_non_zero_quantity_items) < len(cart):
             request.session['cart'] = sorted_existing_non_zero_quantity_items
@@ -57,9 +69,10 @@ class CartView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        # cart = request.session.get('cart')
+        """GET-запрос для просмотра товаров в корзине."""
 
-        cart = CartCheck.check_for_unexisting_items_and_zeros_quantities(request)
+        cart_checker = CartChecker()
+        cart = cart_checker.del_unexisting_items_and_zeros_quantities(request)
 
         if not cart or all(quantity == 0 for quantity in cart.values()):
             return Response({'message': 'Корзина пуста'},
@@ -67,21 +80,8 @@ class CartView(APIView):
 
         item_ids = sorted([int(item_id) for item_id in cart.keys()])
 
-        # non_zero_quantity_items = {item_id: quantity for item_id, quantity in
-        #                            cart.items() if quantity > 0}
-
-        non_zero_quantity_items = CartCheck.check_for_unexisting_items_and_zeros_quantities(request)
-
-        print('non_zero_quantity_items', non_zero_quantity_items)
-
-        # if len(non_zero_quantity_items) < len(cart):
-        #     request.session['cart'] = non_zero_quantity_items
-        #     request.session.modified = True
-
         items_in_cart = Item.objects.filter(
-            id__in=non_zero_quantity_items).prefetch_related('tags').order_by('id')
-
-        print('items_in_cart', items_in_cart)
+            id__in=cart).prefetch_related('tags').order_by('id')
 
         # Т.к. в request.session ключи всегда строки,
         # даже если исходные ключи были числами, то передаем str(item_id).
@@ -106,12 +106,10 @@ class CartView(APIView):
             item_data['quantity'] = quantity
             item_data['price_for_all_items'] = quantity * price_per_item
 
-        return Response({
-            'total_quantity': total_quantity,
-            'quantity_per_item': quantity_per_item,
-            'cart_total_price': cart_total_price,
-            'items': serializer.data
-        })
+        return Response({'total_quantity': total_quantity,
+                         'quantity_per_item': quantity_per_item,
+                         'cart_total_price': cart_total_price,
+                         'items': serializer.data})
 
 
 class AddToCartView(APIView):
@@ -120,6 +118,11 @@ class AddToCartView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        """POST-запрос для добавления товаров в корзину."""
+
+        cart_checker = CartChecker()
+        cart = cart_checker.del_unexisting_items_and_zeros_quantities(request)
+
         serializer = AddToCartSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -127,21 +130,14 @@ class AddToCartView(APIView):
         quantity = serializer.validated_data.get('quantity', 1)
 
         item = get_object_or_404(Item, id=item_id)
-        # cart = request.session.get('cart', {})
-        cart = CartCheck.check_for_unexisting_items_and_zeros_quantities(request)
-
-        print('cart_before_add', cart)
 
         if str(item.id) in cart.keys() and cart[str(item_id)] > 0:
             return Response(
                 {'message': 'Вы уже добавили этот товар в корзину'},
                 status.HTTP_302_FOUND)
 
-        # cart[item_id] = cart.get(item_id, 0) + quantity
         cart[str(item_id)] = cart.get(item_id, 0) + quantity
         request.session['cart'] = cart
-
-        print('cart_after_add', cart)
 
         return Response({
             'message': 'Товар добавлен в корзину',
@@ -164,19 +160,14 @@ class UpdateCartView(APIView):
     def post(self, request):
         """POST-запрос для обновления количества товаров в корзине."""
 
+        cart_checker = CartChecker()
+
         serializer = UpdateCartSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         try:
-            # CartCheck.check_for_unexisting_items_and_zeros_quantities(request)
-
-            # Не использую get('cart', {}) намеренно, чтобы при ошибке
-            # не создавать пустую козину, а лишь проверить на существование
-            # cart = request.session['cart']
-            cart = CartCheck.check_for_unexisting_items_and_zeros_quantities(request)
-
-            print('Корзина до добавления', cart)
-
+            # Проверяем, что в корзине что-то есть.
+            cart = cart_checker.del_unexisting_items_and_zeros_quantities(request)
             item_id = str(serializer.validated_data['item_id'])
             item_quantity = serializer.validated_data['quantity']
 
@@ -191,8 +182,6 @@ class UpdateCartView(APIView):
                         {'error': 'В корзине нет такого количества товара'},
                         status.HTTP_400_BAD_REQUEST)
                 cart[item_id] += int(item_quantity)
-
-                print('Корзина после добавления', cart)
 
                 request.session['cart'] = cart
                 return Response({'message': 'Количество товара обновлено'},
@@ -233,7 +222,8 @@ class CheckoutView(APIView):
     def post(self, request):
         """POST-запрос для оформления заказа."""
 
-        cart = CartCheck.check_for_unexisting_items_and_zeros_quantities(request)
+        cart_checker = CartChecker()
+        cart = cart_checker.del_unexisting_items_and_zeros_quantities(request)
 
         # Если корзина пуста или содержит товары с нулевым количеством -
         # показываем ошибку о пустой корзине.
@@ -255,19 +245,7 @@ class CheckoutView(APIView):
         )
         order.save()
 
-        # item_ids = list(request.session['cart'].keys())
-        item_ids = list(cart.keys())
-
-        print('cart_items_before_sort', Item.objects.filter(id__in=item_ids))
-
-        cart_items = Item.objects.filter(id__in=item_ids).prefetch_related('tags').order_by('id')
-
-        print('cart_items_after_sort', cart_items)
-
-        # order_item = [OrderItem(order=order, item=item, quantity=quantity) for
-        #               quantity, item in
-        #               zip(request.session['cart'].values(), cart_items)]
-
+        cart_items = cart_checker.get_cart_items(request)
         order_item = [OrderItem(order=order, item=item, quantity=quantity) for
                       quantity, item in
                       zip(cart.values(), cart_items)]

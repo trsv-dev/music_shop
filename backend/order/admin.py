@@ -16,14 +16,14 @@ class ItemsInLine(admin.TabularInline):
         от его количества в заказе.
         """
 
-        return f'{obj.item.price * obj.quantity:,} руб.'
+        return f'{(obj.item.discount_price if obj.item.is_discount else obj.item.price) * obj.quantity:,} руб.'
 
     price_for_all_items.short_description = 'Общая стоимость'
 
     def price_per_item(self, obj):
         """Отображение стоимости одной единицы товара."""
 
-        return f'{obj.item.price:,} руб.'
+        return f'{obj.item.discount_price if obj.item.is_discount else obj.item.price:,} руб.'
 
     price_per_item.short_description = 'Стоимость за единицу'
 
@@ -38,7 +38,7 @@ class OrderAdmin(admin.ModelAdmin):
                     'show_items_total_quantity', 'communication_method',
                     'show_order_notes', 'created_date')
     ordering = ('-created_date',)
-    search_fields = ('first_name', 'last_name', 'address',
+    search_fields = ('first_name', 'order_number', 'last_name', 'address',
                      'email', 'communication_method')
     inlines = (
         ItemsInLine,
@@ -48,7 +48,7 @@ class OrderAdmin(admin.ModelAdmin):
     def total_price(self, obj):
         """Отображение полной стоимости заказа."""
 
-        return f'{sum(item.item.price * item.quantity for item in obj.orderitem_set.all()):,} руб.'
+        return f'{sum((item.item.discount_price if item.item.is_discount else item.item.price) * item.quantity for item in obj.orderitem_set.all()):,} руб.'
 
     total_price.short_description = 'Полная стоимость'
 

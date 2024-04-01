@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from item.models import Item
 
@@ -13,22 +14,45 @@ admin.site.index_title = "Добро пожаловать магазин муз�
 class ItemAdmin(admin.ModelAdmin):
     """Класс администрирования товаров."""
 
-    list_display = ('id', 'name', 'show_description', 'short_description',
-                    'category', 'show_tags', 'show_image', 'is_special_offer',
-                    'show_price', 'is_discount', 'show_discount_price',
-                    'add_date', 'is_published', 'is_on_main')
+    fields = ('name', 'short_description', 'description', 'category', 'tags',
+              'image', 'show_image_preview', 'is_special_offer', 'price',
+              'is_discount', 'discount_price', 'is_published', 'is_on_main')
+    list_display = ('id', 'show_name', 'show_description',
+                    'show_short_description', 'category', 'show_tags',
+                    'show_image', 'is_special_offer', 'show_price',
+                    'is_discount', 'show_discount_price', 'add_date',
+                    'is_published', 'is_on_main')
+    readonly_fields = ('show_image_preview',)
     ordering = ('-add_date',)
     search_fields = ('name', 'description')
     list_per_page = 25
 
+    def show_name(self, obj):
+        """Отображение 'укороченного' описания товара."""
+
+        return obj.name if (len(obj.name) <
+                                   settings.NAME_LENGHT) else (
+                obj.name[:settings.NAME_LENGHT] + '...')
+
+    show_name.short_description = 'Описание'
+
     def show_description(self, obj):
-        """Отображение укороченного описания товара."""
+        """Отображение 'укороченного' описания товара."""
 
         return obj.description if (len(obj.description) <
                                    settings.DESCRIPTION_LENGHT) else (
                 obj.description[:settings.DESCRIPTION_LENGHT] + '...')
 
     show_description.short_description = 'Описание'
+
+    def show_short_description(self, obj):
+        """Отображение 'укороченного' короткого описания товара."""
+
+        return obj.short_description if (len(obj.short_description) <
+                                   settings.SHORT_DESCRIPTION_LENGHT) else (
+                obj.short_description[:settings.SHORT_DESCRIPTION_LENGHT] + '...')
+
+    show_short_description.short_description = 'Краткое описание'
 
     def show_tags(self, obj):
         """Отображение тегов товара."""
@@ -65,3 +89,15 @@ class ItemAdmin(admin.ModelAdmin):
         return 'Нет изображения'
 
     show_image.short_description = 'Изображение'
+
+    def show_image_preview(self, obj):
+        """Превью изображения товара при редактировании."""
+
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width: 250px; max-height: 250px; '
+                'object-fit: cover;" />', obj.image.url
+            )
+        return 'Нет изображения'
+
+    show_image_preview.short_description = 'Превью'

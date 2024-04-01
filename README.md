@@ -15,6 +15,8 @@
 
 <summary>Инструкция по запуску</summary>
 
+### **_Вариант 1. Запуск из консоли._**
+
 Клонируйте репозиторий с **develop веткой** к себе на машину:
 ```
 git clone git@github.com:trsv-dev/music_shop.git -b develop
@@ -53,6 +55,39 @@ python manage.py createsuperuser
 python manage.py runserver 127.0.0.1:10000
 ```
 Перейдите в браузере по ссылке http://127.0.0.1:10000/admin/, вам будет доступна админка.
+
+### **_Вариант 2. Запуск Docker-контейнера._**
+
+Клонируйте репозиторий с **develop веткой** к себе на машину:
+```
+git clone git@github.com:trsv-dev/music_shop.git -b develop
+```
+Перейдите в папку проекта:
+```
+cd music_shop/
+```
+Переименовать **.env.example** в **.env**.
+
+Запустите контейнер в фоновом режиме:
+```
+docker compose -f docker-compose.yml up -d
+```
+Выполните и примените миграции БД (выполнять последовательно):
+```
+docker compose -f docker-compose.yml exec backend python manage.py makemigrations
+docker compose -f docker-compose.yml exec backend python manage.py migrate
+```
+Соберите и скопируйте статику (выполнять последовательно):
+```
+docker compose -f docker-compose.yml exec backend python manage.py collectstatic
+docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /app/static/
+```
+Создайте суперпользователя:
+```
+docker compose -f docker-compose.yml exec backend python manage.py createsuperuser
+```
+
+Теперь вам должны быть доступны эндпоинты, описанные ниже.
 
 </details>
 <details>

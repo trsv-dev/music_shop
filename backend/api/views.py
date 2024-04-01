@@ -11,6 +11,7 @@ class ItemsViewSet(viewsets.ModelViewSet):
 
     queryset = Item.objects.filter(is_published=True).prefetch_related('tags')
     serializer_class = ItemsSerializer
+    http_method_names = ['get']
 
 
 class BlogViewSet(viewsets.ModelViewSet):
@@ -18,6 +19,7 @@ class BlogViewSet(viewsets.ModelViewSet):
 
     queryset = Blog.objects.filter(is_published=True)
     serializer_class = BlogSerializer
+    http_method_names = ['get']
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -25,6 +27,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    http_method_names = ['get']
 
 
 class DiscountViewSet(viewsets.ModelViewSet):
@@ -34,6 +37,7 @@ class DiscountViewSet(viewsets.ModelViewSet):
         is_discount=True, discount_price__gt=0, is_published=True
     ).prefetch_related('tags')
     serializer_class = ItemsSerializer
+    http_method_names = ['get']
 
 
 class SpecialOfferViewSet(viewsets.ModelViewSet):
@@ -43,3 +47,4 @@ class SpecialOfferViewSet(viewsets.ModelViewSet):
         is_special_offer=True, is_published=True
     ).prefetch_related('tags')
     serializer_class = ItemsSerializer
+    http_method_names = ['get']

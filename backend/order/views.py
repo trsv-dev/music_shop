@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from api.serializers import (ItemsSerializer, UpdateCartSerializer,
                              AddToCartSerializer, OrderSerializer)
+from api.utils import send_email_message, templates
 from item.models import Item
 from order.models import Order, OrderItem
 
@@ -254,6 +255,9 @@ class CheckoutView(APIView):
 
         request.session['cart'] = {}
         request.session.modified = True
+
+        send_email_message(order, order_item, recipient_type='customer')
+        send_email_message(order, order_item, recipient_type='admin')
 
         return Response({'message': 'Заказ успешно оформлен'},
                         status.HTTP_201_CREATED)

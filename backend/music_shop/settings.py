@@ -54,10 +54,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'music_shop.urls'
 
+TEMPLATES_DIR = BASE_DIR / 'templates'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -142,8 +144,30 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Viewing settings
+###############################################################################
+
 NAME_LENGHT = int(os.getenv('NAME_LENGHT', 30))
 DESCRIPTION_LENGHT = int(os.getenv('DESCRIPTION_LENGHT', 50))
 SHORT_DESCRIPTION_LENGHT = int(os.getenv('SHORT_DESCRIPTION_LENGHT', 50))
 BLOG_TEXT_LENGHT = int(os.getenv('BLOG_TEXT_LENGHT', 150))
 ORDER_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@email.xoxo')
+
+# Sending emails via Yandex mail (Don't work on pythonanywhere.com)
+###############################################################################
+
+RECIPIENT_ADDRESS = os.getenv('RECIPIENT_ADDRESS',
+                              'your_email_on_yandex@yandex.ru')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.yandex.ru')
+EMAIL_PORT = os.getenv('EMAIL_PORT', '465')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL',
+                               'your_email_on_yandex@yandex.ru')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER',
+                            'your_email_on_yandex@yandex.ru')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD',
+                                'your_strong_email_password')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
+                          'django.core.mail.backends.smtp.EmailBackend')

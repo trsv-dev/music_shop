@@ -89,6 +89,27 @@ docker compose -f docker-compose.yml exec backend python manage.py createsuperus
 
 Теперь вам должны быть доступны эндпоинты, описанные ниже.
 
+### **_Отправка почты._**
+
+Чтобы работало оповещение покупателя и админа о новом заказе, 
+в .env замените раздел с email на тестовые настройки:
+```
+#Email settings:
+###############################################################################
+RECIPIENT_ADDRESS='trsv.dev@yandex.ru'
+EMAIL_HOST='smtp.yandex.ru'
+EMAIL_PORT=465
+EMAIL_USE_SSL=True
+DEFAULT_FROM_EMAIL='trsv.dev@yandex.ru'
+EMAIL_HOST_USER='trsv.dev@yandex.ru'
+EMAIL_HOST_PASSWORD='hzitlzdryltagtly'
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+```
+и укажите email администратора (замените на свой):
+```
+ADMIN_EMAIL=admin@email.xoxo
+```
+
 </details>
 <details>
 <summary>Информация об эндпоинтах</summary>

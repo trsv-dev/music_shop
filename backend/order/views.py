@@ -18,11 +18,18 @@ class CartChecker:
     def get_cart(self, request):
         """Получение корзины."""
 
-        try:
-            cart = request.session['cart']
+        # try:
+        #     cart = request.session['cart']
+        #     return cart
+        # except KeyError:
+        #     raise SuspiciousOperation('Корзина не найдена')
+
+        if not request.session.get('cart'):
+            cart = {}
+            request.session['cart'] = cart
+
             return cart
-        except KeyError:
-            raise SuspiciousOperation('Корзина не найдена')
+        return request.session['cart']
 
     def get_cart_items(self, request):
         """Получение товаров, имеющий такой же id, как ключи корзины."""
@@ -247,17 +254,24 @@ class CheckoutView(APIView):
         order.save()
 
         cart_items = cart_checker.get_cart_items(request)
-        order_item = [OrderItem(order=order, item=item, quantity=quantity) for
+        order_items = [OrderItem(order=order, item=item, quantity=quantity) for
                       quantity, item in
                       zip(cart.values(), cart_items)]
 
-        OrderItem.objects.bulk_create(order_item)
+        OrderItem.objects.bulk_create(order_items)
 
         request.session['cart'] = {}
         request.session.modified = True
 
-        send_email_message(order, order_item, recipient_type='customer')
-        send_email_message(order, order_item, recipient_type='admin')
+        send_email_message.apply_async(kwargs={
+            'order_id': order.id,
+            'order_item_ids': [order_item.id for order_item in order_items],
+            'recipient_type': 'admin'})
+
+        send_email_message.apply_async(kwargs={
+            'order_id': order.id,
+            'order_item_ids': [order_item.id for order_item in order_items],
+            'recipient_type': 'customer'})
 
         return Response({'message': 'Заказ успешно оформлен'},
                         status.HTTP_201_CREATED)

@@ -9,7 +9,7 @@
     <p>Вам поступил новый заказ "<strong>{{order_number}}</strong>" от <strong>{{order_date}}</strong></p>
     <p>В заказе следующие товары:</p>
     <ul>
-        {% for order_item in order_item %}
+        {% for order_item in order_items %}
             <li>{{ order_item.item.name }} ({{order_item.quantity}} шт.)</li>
         {% endfor %}
     </ul>

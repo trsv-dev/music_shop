@@ -1,9 +1,11 @@
 version: '3.3'
 
 volumes:
-  pg_data:
   static:
   media:
+  redis_data:
+  workers_data:
+  flower_data:
 
 services:
   backend:
@@ -28,3 +30,43 @@ services:
     depends_on:
       backend:
         condition: service_started
+
+  redis:
+    container_name: redis
+    image: redis:7.2-alpine
+    env_file:
+      - .env
+    volumes:
+      - redis_data:/data
+
+  flower:
+    container_name: flower
+    image: mher/flower:2.0.0
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - FLOWER_PORT=${FLOWER_PORT}
+      - FLOWER_BASIC_AUTH=${FLOWER_USER}:${FLOWER_PASSWORD}
+    ports:
+      - ${FLOWER_PORT}:5555
+    volumes:
+      - flower_data:/data
+    depends_on:
+      - celery_worker_queue
+
+  celery_worker_queue:
+    container_name: celery_worker_queue
+    build: ./backend/
+    env_file:
+      - .env
+    hostname: celery_worker_queue
+    entrypoint: celery
+    command: -A music_shop.celery worker -l info -n celery_worker_queue
+    volumes:
+      - workers_data:/app/workers_data
+    links:
+      - redis
+    depends_on:
+      - redis
+      - backend

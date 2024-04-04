@@ -13,9 +13,9 @@
 
 <details>
 
-<summary>Инструкция по запуску</summary>
+<summary>Инструкция по запуску в режиме локальной разработки</summary>
 
-### **_Вариант 1. Запуск из консоли._**
+### **_Запуск из консоли._**
 
 Клонируйте репозиторий с **develop веткой** к себе на машину:
 ```
@@ -37,6 +37,45 @@ source venv/bin/activate
 ```
 cd backend/
 ```
+Переименовать **.env.example** в **.env**.
+
+Убедитесь, что конфигурация Celery в .env настроена на использование в локальной среде.
+Она должна выглядеть так:
+```
+#Celery settings:
+###############################################################################
+
+#### Uncomment these two strings if you use it in Docker:
+#### Comment it if you use in in local development:
+#CELERY_BROKER_URL='redis://redis:6379/0'
+#CELERY_RESULT_BACKEND='redis://redis:6379/0'
+
+#### Uncomment these two strings if you use in in local development.
+#### Comment it if you use Docker:
+CELERY_BROKER_URL='redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND='redis://127.0.0.1:6379/0'
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP=True
+```
+Чтобы работало оповещение покупателя и админа о новом заказе, 
+в .env замените раздел с email на тестовые настройки:
+```
+#Email settings:
+###############################################################################
+RECIPIENT_ADDRESS='trsv.dev@yandex.ru'
+EMAIL_HOST='smtp.yandex.ru'
+EMAIL_PORT=465
+EMAIL_USE_SSL=True
+DEFAULT_FROM_EMAIL='trsv.dev@yandex.ru'
+EMAIL_HOST_USER='trsv.dev@yandex.ru'
+EMAIL_HOST_PASSWORD='hzitlzdryltagtly'
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+```
+и укажите email администратора (замените на свой):
+```
+ADMIN_EMAIL=admin@email.xoxo
+```
+
 Установите зависимости из файла requirements.txt:
 ```
 pip install -r requirements.txt
@@ -54,9 +93,35 @@ python manage.py createsuperuser
 ```
 python manage.py runserver 127.0.0.1:10000
 ```
+Открываем еще одно окно терминала, скачиваем контейнер с Redis:
+```
+docker pull redis
+```
+И запускаем его в режиме демона:
+```
+docker run -d --name redis -p 6379:6379 redis
+```
+Запускаем воркер Celery (**_в отдельном окне консоли_**, открытом по тому же пути, т.е. в папке /backend):
+```
+celery -A music_shop.celery worker -l info
+```
+**_Опционально:_** Запуск Flower (**_в отдельном окне консоли_**, открытом по тому же пути, т.е. в папке /backend). Мониторинг задач в celery будет доступен по http://127.0.0.1:5555
+```
+celery -A music_shop.celery flower
+```
+
 Перейдите в браузере по ссылке http://127.0.0.1:10000/admin/, вам будет доступна админка.
 
-### **_Вариант 2. Запуск Docker-контейнера._**
+Flower доступен по http://127.0.0.1:5555 
+с логином/паролем, заданным вами в .env (по умолчанию - _admin_ / _MySuperStrongPassword_).
+
+</details>
+
+<details>
+
+<summary>Инструкция по запуску в Docker-контейнерах</summary>
+
+### **_Запуск в контейнерах._**
 
 Клонируйте репозиторий с **develop веткой** к себе на машину:
 ```
@@ -68,6 +133,42 @@ cd music_shop/
 ```
 Переименовать **.env.example** в **.env**.
 
+Убедитесь, что конфигурация Celery в .env настроена на использование в контейнерах.
+Она должна выглядеть так:
+```
+#Celery settings:
+###############################################################################
+
+#### Uncomment these two strings if you use it in Docker:
+#### Comment it if you use in in local development:
+CELERY_BROKER_URL='redis://redis:6379/0'
+CELERY_RESULT_BACKEND='redis://redis:6379/0'
+
+#### Uncomment these two strings if you use in in local development.
+#### Comment it if you use Docker:
+#CELERY_BROKER_URL='redis://127.0.0.1:6379/0'
+#CELERY_RESULT_BACKEND='redis://127.0.0.1:6379/0'
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP=True
+```
+Чтобы работало оповещение покупателя и админа о новом заказе, 
+в .env замените раздел с email на тестовые настройки:
+```
+#Email settings:
+###############################################################################
+RECIPIENT_ADDRESS='trsv.dev@yandex.ru'
+EMAIL_HOST='smtp.yandex.ru'
+EMAIL_PORT=465
+EMAIL_USE_SSL=True
+DEFAULT_FROM_EMAIL='trsv.dev@yandex.ru'
+EMAIL_HOST_USER='trsv.dev@yandex.ru'
+EMAIL_HOST_PASSWORD='hzitlzdryltagtly'
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+```
+и укажите email администратора (замените на свой):
+```
+ADMIN_EMAIL=admin@email.xoxo
+```
 Запустите контейнер в фоновом режиме:
 ```
 docker compose -f docker-compose.yml up -d
@@ -87,28 +188,10 @@ docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. 
 docker compose -f docker-compose.yml exec backend python manage.py createsuperuser
 ```
 
-Теперь вам должны быть доступны эндпоинты, описанные ниже.
+Перейдите в браузере по ссылке http://127.0.0.1:10000/admin/, вам будет доступна админка.
 
-### **_Отправка почты._**
-
-Чтобы работало оповещение покупателя и админа о новом заказе, 
-в .env замените раздел с email на тестовые настройки:
-```
-#Email settings:
-###############################################################################
-RECIPIENT_ADDRESS='trsv.dev@yandex.ru'
-EMAIL_HOST='smtp.yandex.ru'
-EMAIL_PORT=465
-EMAIL_USE_SSL=True
-DEFAULT_FROM_EMAIL='trsv.dev@yandex.ru'
-EMAIL_HOST_USER='trsv.dev@yandex.ru'
-EMAIL_HOST_PASSWORD='hzitlzdryltagtly'
-EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-```
-и укажите email администратора (замените на свой):
-```
-ADMIN_EMAIL=admin@email.xoxo
-```
+Flower доступен по http://127.0.0.1:5555 
+с логином/паролем, заданным вами в .env (по умолчанию - _admin_ / _MySuperStrongPassword_).
 
 </details>
 <details>

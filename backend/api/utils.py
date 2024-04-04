@@ -1,5 +1,6 @@
 import socket
 from smtplib import SMTPException
+from celery import shared_task
 
 from django.conf import settings
 from django.conf.global_settings import EMAIL_HOST_USER
@@ -7,6 +8,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
 from music_shop.settings import TEMPLATES_DIR
+from order.models import Order, OrderItem
 
 templates = {
     'to_admin_about_new_order':
@@ -16,7 +18,32 @@ templates = {
 }
 
 
-def send_email_message(order, order_item, recipient_type=None):
+def get_total_price(order_items):
+    """Вычисление общей суммы заказа."""
+
+    return sum(
+        (order_item.item.discount_price if order_item.item.is_discount else
+         order_item.item.price) * order_item.quantity for
+        order_item in order_items
+    )
+
+
+def get_template_and_email(order, recipient_type):
+    """Определение шаблона письма и адресата."""
+
+    if recipient_type == 'admin':
+        template_name = templates['to_admin_about_new_order']
+        recipient_email = settings.ADMIN_EMAIL
+
+    else:
+        template_name = templates['to_customer_about_new_order']
+        recipient_email = order.email
+
+    return template_name, recipient_email
+
+
+@shared_task
+def send_email_message(order_id, order_item_ids, recipient_type=None):
     """
     Отправка писем на электронную почту.
     """
@@ -26,17 +53,16 @@ def send_email_message(order, order_item, recipient_type=None):
             "Недопустимое значение recipient_type. "
             "Допустимые значения: 'admin', 'customer.")
 
-    total_price = sum(
-        (order_item.item.discount_price if order_item.item.is_discount else
-         order_item.item.price) * order_item.quantity for
-        order_item in order_item)
+    order = Order.objects.get(id=order_id)
+    order_items = OrderItem.objects.filter(id__in=order_item_ids)
 
+    total_price = get_total_price(order_items)
     total_price_formatted = f'{total_price:,} руб.'
 
     context = {
         'first_name': order.first_name,
         'last_name': order.last_name,
-        'order_item': order_item,
+        'order_items': order_items,
         'order_number': order.order_number,
         'order_date': order.created_date,
         'total_price': total_price_formatted,
@@ -44,21 +70,15 @@ def send_email_message(order, order_item, recipient_type=None):
         'communication_method': order.communication_method
     }
 
-    if recipient_type == 'admin':
-        template_name = templates['to_admin_about_new_order']
-        recipient_email = settings.ADMIN_EMAIL
-    else:
-        template_name = templates['to_customer_about_new_order']
-        recipient_email = order.email
-
-    message = render_to_string(template_name=template_name, context=context)
+    template, email = get_template_and_email(order, recipient_type)
+    message = render_to_string(template_name=template, context=context)
 
     try:
         send_mail(
             subject='Письмо от Music Shop',
             message=message,
             from_email=EMAIL_HOST_USER,
-            recipient_list=[recipient_email],
+            recipient_list=[email],
             html_message=message
         )
     except socket.gaierror as e:

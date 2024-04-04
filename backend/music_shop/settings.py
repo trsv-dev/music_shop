@@ -171,3 +171,17 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD',
                                 'your_strong_email_password')
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
                           'django.core.mail.backends.smtp.EmailBackend')
+
+# Celery settings
+###############################################################################
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND',
+                                  'redis://127.0.0.1:6379/0')
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = os.getenv(
+    'CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP', 'True') == 'True'
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'priority_steps': list(range(10)),
+    'queue_order_strategy': 'priority',
+}

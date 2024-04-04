@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказ номер "{{order_number}}" принят</title>
+</head>
+<body>
+    <p>Привет, <strong>{{first_name}} {{last_name}}</strong>! 👋</p>
+    <p>Ваш заказ с идентификатором "<strong>{{order_number}}</strong>" от <strong>{{order_date}}</strong> принят.</p>
+    <p>У вас в заказе следующие товары:</p>
+    <ul>
+        {% for order_item in order_items %}
+            <li>{{ order_item.item.name }} ({{order_item.quantity}} шт.)</li>
+        {% endfor %}
+    </ul>
+    <p>Общая стоимость заказа: <strong>{{total_price}}</strong></p>
+    <p>В ближайшее время мы с вами свяжемся.</p>
+    <br>
+    <p>Не отвечайте на это письмо, оно сгенерировано автоматически.</p>
+</body>
+</html>

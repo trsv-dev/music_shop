@@ -16,20 +16,12 @@ class CartChecker:
     """Класс проверок для корзины."""
 
     def get_cart(self, request):
-        """Получение корзины."""
+        """
+        Получение корзины если она есть в запросе или
+        создание пустой корзины, если корзины в запросе нет.
+        """
 
-        # try:
-        #     cart = request.session['cart']
-        #     return cart
-        # except KeyError:
-        #     raise SuspiciousOperation('Корзина не найдена')
-
-        if not request.session.get('cart'):
-            cart = {}
-            request.session['cart'] = cart
-
-            return cart
-        return request.session['cart']
+        return request.session.get('cart', {})
 
     def get_cart_items(self, request):
         """Получение товаров, имеющий такой же id, как ключи корзины."""
@@ -83,8 +75,7 @@ class CartView(APIView):
         cart = cart_checker.del_unexisting_items_and_zeros_quantities(request)
 
         if not cart or all(quantity == 0 for quantity in cart.values()):
-            return Response({'message': 'Корзина пуста'},
-                            status.HTTP_204_NO_CONTENT)
+            return Response({'message': 'Корзина пуста'}, status.HTTP_200_OK)
 
         item_ids = sorted([int(item_id) for item_id in cart.keys()])
 
@@ -218,7 +209,7 @@ class DeleteCartView(APIView):
                             status.HTTP_200_OK)
 
         return Response({'message': 'Корзина пуста'},
-                        status.HTTP_204_NO_CONTENT)
+                        status.HTTP_200_OK)
 
 
 class CheckoutView(APIView):

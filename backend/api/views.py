@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination
 
 from api.serializers import ItemsSerializer, BlogSerializer, CategorySerializer
 from blog.models import Blog
@@ -12,14 +13,16 @@ class ItemsViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.filter(is_published=True).prefetch_related('tags')
     serializer_class = ItemsSerializer
     http_method_names = ['get']
+    pagination_class = PageNumberPagination
 
 
 class BlogViewSet(viewsets.ModelViewSet):
     """Вьюсет записей в блоге."""
 
-    queryset = Blog.objects.filter(is_published=True)
+    queryset = Blog.objects.filter(is_published=True).order_by('-id')
     serializer_class = BlogSerializer
     http_method_names = ['get']
+    pagination_class = PageNumberPagination
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

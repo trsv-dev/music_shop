@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
 from rest_framework.pagination import PageNumberPagination
 
 from api.serializers import ItemsSerializer, BlogSerializer, CategorySerializer
@@ -14,6 +15,11 @@ class ItemsViewSet(viewsets.ModelViewSet):
     serializer_class = ItemsSerializer
     http_method_names = ['get']
     pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,
+                       filters.OrderingFilter)
+    ordering_fields = ('price', 'discount_price')
+    filterset_fields = ('is_discount', 'is_special_offer')
+    search_fields = ('^name',)
 
 
 class BlogViewSet(viewsets.ModelViewSet):
@@ -23,6 +29,8 @@ class BlogViewSet(viewsets.ModelViewSet):
     serializer_class = BlogSerializer
     http_method_names = ['get']
     pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('^title',)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

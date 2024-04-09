@@ -48,8 +48,7 @@ class Item(models.Model):
         help_text='Загрузите изображение'
     )
     is_special_offer = models.BooleanField(
-        blank=True,
-        null=True,
+        default=False,
         verbose_name='Уникальное предложение?',
         help_text='Лимитированная серия? / уникальное предложение?',
         choices=(
@@ -64,8 +63,7 @@ class Item(models.Model):
         help_text='Введите цену без акции'
     )
     is_discount = models.BooleanField(
-        blank=True,
-        null=True,
+        default=False,
         verbose_name='Распродажа?',
         help_text='Участвует в распродаже?',
         choices=(

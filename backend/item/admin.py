@@ -23,6 +23,7 @@ class ItemAdmin(admin.ModelAdmin):
                     'is_discount', 'show_discount_price', 'add_date',
                     'is_published', 'is_on_main')
     readonly_fields = ('show_image_preview',)
+    list_filter = ('is_published', 'is_discount', 'is_special_offer')
     ordering = ('-add_date',)
     search_fields = ('name', 'description')
     list_per_page = 25

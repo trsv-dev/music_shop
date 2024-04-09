@@ -12,6 +12,7 @@ class BlogAdmin(admin.ModelAdmin):
     search_fields = ('title', 'text')
     prepopulated_fields = {'slug': ('title',)}
     ordering = ('-add_date',)
+    list_filter = ('is_published',)
     list_per_page = 25
 
     def show_text(self, obj):

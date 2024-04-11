@@ -2,12 +2,22 @@ import locale
 import random
 import string
 
-from django.conf import settings
 from django.db import models
 
+from api.utils import send_email_message
 from item.models import Item
 
 locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+
+NEW = 'Новый'
+IN_PROGRESS = 'В работе'
+RECEIVED = 'Заказ получен'
+SENT = 'Отправлен'
+
+STATUS = [(NEW, 'Новый'),
+          (IN_PROGRESS, 'В работе'),
+          (RECEIVED, 'Заказ получен'),
+          (SENT, 'Отправлен')]
 
 
 class Order(models.Model):
@@ -18,6 +28,14 @@ class Order(models.Model):
         max_length=10,
         editable=False,
         verbose_name='Идентификатор заказа'
+    )
+    status = models.CharField(
+        max_length=120,
+        choices=STATUS,
+        default=NEW,
+        blank=False,
+        verbose_name='Статус заказа',
+        help_text='Укажите статус заказа'
     )
     first_name = models.CharField(
         max_length=255,
@@ -66,6 +84,13 @@ class Order(models.Model):
         verbose_name='Примечания к заказу',
         help_text='Напишите ваши дополнительные пожелания (необязательно)'
     )
+    admin_notes = models.TextField(
+        max_length=1000,
+        blank=True,
+        null=True,
+        verbose_name='Примечания администратора',
+        help_text='Заметки для администратора (необязательно)'
+    )
     created_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата и время добавления'
@@ -83,6 +108,17 @@ class Order(models.Model):
             list(alphabet_lowercase + alphabet_uppercase + numbers), 10))
 
     def save(self, *args, **kwargs):
+        # Если статус заказа изменился - отправляем пользователю письмо.
+        if self.pk:
+            original_order = Order.objects.get(pk=self.pk)
+            if original_order.status != self.status:
+                send_email_message.apply_async(kwargs={
+                    'order_id': self.pk,
+                    'order_item_ids': None,
+                    'recipient_type': 'status_changed'
+                })
+
+        # Присваиваем заказу уникальный идентификатор.
         if not self.order_number:
             self.order_number = self.generate_order_number()
 

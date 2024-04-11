@@ -24,7 +24,7 @@ class CartChecker:
         return request.session.get('cart', {})
 
     def get_cart_items(self, request):
-        """Получение товаров, имеющий такой же id, как ключи корзины."""
+        """Получение товаров, имеющих такой же id, как ключи корзины."""
 
         cart = self.get_cart(request)
 

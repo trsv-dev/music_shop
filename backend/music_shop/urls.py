@@ -1,9 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.template.defaulttags import url
-from django.urls import path, include, re_path
-from rest_framework import routers, permissions
+from django.urls import path, include
+from rest_framework import routers
 
 from api.views import (ItemsViewSet, BlogViewSet, CategoryViewSet,
                        DiscountViewSet, SpecialOfferViewSet)
@@ -27,6 +26,7 @@ urlpatterns = [
     path('api/v1/delete_cart/', DeleteCartView.as_view(), name='delete_cart'),
     path('api/v1/update_cart/', UpdateCartView.as_view(), name='update_cart'),
     path('api/v1/checkout/', CheckoutView.as_view(), name='update_cart'),
+    path('tinymce/', include('tinymce.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
 

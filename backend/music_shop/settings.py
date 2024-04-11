@@ -32,6 +32,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'tinymce',
     'debug_toolbar',
 
     'item.apps.ItemConfig',
@@ -153,6 +154,7 @@ DESCRIPTION_LENGHT = int(os.getenv('DESCRIPTION_LENGHT', 50))
 SHORT_DESCRIPTION_LENGHT = int(os.getenv('SHORT_DESCRIPTION_LENGHT', 50))
 BLOG_TEXT_LENGHT = int(os.getenv('BLOG_TEXT_LENGHT', 150))
 ORDER_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
+ADMIN_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@email.xoxo')
 
 # Sending emails via Yandex mail (Don't work on pythonanywhere.com)
@@ -184,4 +186,35 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = os.getenv(
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'priority_steps': list(range(10)),
     'queue_order_strategy': 'priority',
+}
+
+TINYMCE_JS_URL = os.path.join(STATIC_URL, "tinymce/tinymce.min.js")
+TINYMCE_COMPRESSOR = False
+
+TINYMCE_DEFAULT_CONFIG = {
+    "height": "520px",
+    "width": "960px",
+    "menubar": "help file edit view insert format tools table",
+    "plugins": 'print preview paste importcss searchreplace autolink autosave '
+               'save directionality code visualblocks visualchars fullscreen '
+               'image link media template codesample table charmap hr pagebreak '
+               'nonbreaking anchor toc insertdatetime advlist lists wordcount '
+               'help charmap quickbars '
+               'emoticons',
+#     # "plugins": 'anchor autolink charmap codesample emoticons image link lists '
+#     #            'media searchreplace table visualblocks wordcount checklist '
+#     #            'mediaembed casechange export formatpainter pageembed '
+#     #            'linkchecker a11ychecker tinymcespellchecker permanentpen '
+#     #            'powerpaste advtable advcode editimage advtemplate ai mentions '
+#     #            'tinycomments tableofcontents footnotes mergetags autocorrect '
+#     #            'typography inlinecss markdown',
+#     # "toolbar": 'undo redo | blocks fontfamily fontsize | '
+#     #            'bold italic underline strikethrough | '
+#     #            'link image media table mergetags | addcomment showcomments | '
+#     #            'spellcheckdialog a11ycheck typography | align lineheight | '
+#     #            'checklist numlist bullist indent outdent | emoticons charmap | '
+#     #            'removeformat',
+    "toolbar": 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+    "toolbar_sticky": "true",
+    "custom_undo_redo_levels": 10,
 }

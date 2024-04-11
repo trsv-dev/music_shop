@@ -32,12 +32,13 @@ class ItemsInLine(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     """Класс администрирования заказов."""
 
-    list_display = ('id', 'order_number', 'first_name', 'last_name',
+    list_display = ('id', 'order_number', 'status', 'first_name', 'last_name',
                     'total_price', 'address', 'email',
                     'show_items_quantity_in_cart',
                     'show_items_total_quantity', 'communication_method',
-                    'show_order_notes', 'created_date')
+                    'show_order_notes', 'show_admin_notes', 'created_date')
     ordering = ('-created_date',)
+    list_filter = ('status',)
     search_fields = ('first_name', 'order_number', 'last_name', 'address',
                      'email', 'communication_method')
     inlines = (
@@ -61,6 +62,16 @@ class OrderAdmin(admin.ModelAdmin):
                     obj.order_notes[:settings.ORDER_NOTES_LENGHT] + '...')
 
     show_order_notes.short_description = 'Примечания к заказу'
+
+    def show_admin_notes(self, obj):
+        """Отображение укороченных примечаний для администратора."""
+
+        if obj.admin_notes:
+            return obj.admin_notes if (len(obj.admin_notes) <
+                                       settings.ADMIN_NOTES_LENGHT) else (
+                    obj.admin_notes[:settings.ADMIN_NOTES_LENGHT] + '...')
+
+    show_admin_notes.short_description = 'Примечания админа'
 
     def show_items_quantity_in_cart(self, obj):
         """Отображение количества наименований в заказе"""

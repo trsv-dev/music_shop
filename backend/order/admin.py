@@ -33,12 +33,13 @@ class OrderAdmin(admin.ModelAdmin):
     """Класс администрирования заказов."""
 
     list_display = ('id', 'order_number', 'status', 'first_name', 'last_name',
-                    'total_price', 'address', 'email',
+                    'total_price', 'email',
                     'show_items_quantity_in_cart',
-                    'show_items_total_quantity', 'communication_method',
+                    'show_items_total_quantity',
                     'show_order_notes', 'show_admin_notes', 'created_date')
     ordering = ('-created_date',)
     list_filter = ('status',)
+    list_editable = ('status',)
     search_fields = ('first_name', 'order_number', 'last_name', 'address',
                      'email', 'communication_method')
     inlines = (

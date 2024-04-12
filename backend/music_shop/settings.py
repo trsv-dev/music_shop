@@ -176,6 +176,7 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
 
 # Celery settings
 ###############################################################################
+
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND',
                                   'redis://127.0.0.1:6379/0')
@@ -188,33 +189,23 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     'queue_order_strategy': 'priority',
 }
 
+# TinyMCE settings
+###############################################################################
+
 TINYMCE_JS_URL = os.path.join(STATIC_URL, "tinymce/tinymce.min.js")
 TINYMCE_COMPRESSOR = False
 
 TINYMCE_DEFAULT_CONFIG = {
     "height": "520px",
-    "width": "960px",
-    "menubar": "help file edit view insert format tools table",
-    "plugins": 'print preview paste importcss searchreplace autolink autosave '
-               'save directionality code visualblocks visualchars fullscreen '
-               'image link media template codesample table charmap hr pagebreak '
-               'nonbreaking anchor toc insertdatetime advlist lists wordcount '
-               'help charmap quickbars '
-               'emoticons',
-#     # "plugins": 'anchor autolink charmap codesample emoticons image link lists '
-#     #            'media searchreplace table visualblocks wordcount checklist '
-#     #            'mediaembed casechange export formatpainter pageembed '
-#     #            'linkchecker a11ychecker tinymcespellchecker permanentpen '
-#     #            'powerpaste advtable advcode editimage advtemplate ai mentions '
-#     #            'tinycomments tableofcontents footnotes mergetags autocorrect '
-#     #            'typography inlinecss markdown',
-#     # "toolbar": 'undo redo | blocks fontfamily fontsize | '
-#     #            'bold italic underline strikethrough | '
-#     #            'link image media table mergetags | addcomment showcomments | '
-#     #            'spellcheckdialog a11ycheck typography | align lineheight | '
-#     #            'checklist numlist bullist indent outdent | emoticons charmap | '
-#     #            'removeformat',
-    "toolbar": 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
-    "toolbar_sticky": "true",
-    "custom_undo_redo_levels": 10,
+    "menubar": "file edit view insert format tools table help",
+    "plugins": 'anchor autolink charmap codesample emoticons image link lists '
+               'media searchreplace table visualblocks wordcount fullscreen '
+               'pagebreak help',
+    "toolbar": 'undo redo blocks fontfamily fontsize '
+               'bold italic underline strikethrough blockquote '
+               'link image media forecolor backcolor table align lineheight '
+               'checklist numlist bullist indent outdent emoticons charmap '
+               'removeformat ',
+    "toolbar_mode": 'sliding',
+    "custom_undo_redo_levels": 15,
 }

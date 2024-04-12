@@ -108,7 +108,8 @@ class Order(models.Model):
             list(alphabet_lowercase + alphabet_uppercase + numbers), 10))
 
     def save(self, *args, **kwargs):
-        # Если статус заказа изменился - отправляем пользователю письмо.
+        # Если заказ уже существует и статус заказа изменился -
+        # отправляем пользователю письмо.
         if self.pk:
             original_order = Order.objects.get(pk=self.pk)
             if original_order.status != self.status:
@@ -118,7 +119,7 @@ class Order(models.Model):
                     'recipient_type': 'status_changed'
                 })
 
-        # Присваиваем заказу уникальный идентификатор.
+        # Присваиваем заказу уникальный идентификатор новому заказу.
         if not self.order_number:
             self.order_number = self.generate_order_number()
 

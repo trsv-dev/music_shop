@@ -1,8 +1,10 @@
 {% extends 'admin/change_form.html' %}
 
-{% block submit_buttons_bottom %}
-    <div class="submit-row">
-            <input type="submit" value="Вкл./выкл. превью" name="_show_preview">
-    </div>
+{% block field_sets %}
     {{ block.super }}
+    <fieldset class="module">
+        <div style="text-align: center;">
+            <input type="submit" value="Вкл./выкл. превью товаров" name="_show_preview">
+        </div>
+    </fieldset>
 {% endblock %}

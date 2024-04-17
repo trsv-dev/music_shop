@@ -232,17 +232,7 @@ class CheckoutView(APIView):
 
         serializer = OrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        order = Order(
-            first_name=serializer.validated_data.get('first_name'),
-            last_name=serializer.validated_data.get('last_name'),
-            address=serializer.validated_data.get('address'),
-            email=serializer.validated_data.get('email'),
-            communication_method=serializer.validated_data.get(
-                'communication_method'),
-            order_notes=serializer.validated_data.get('order_notes')
-        )
-        order.save()
+        order = serializer.save()
 
         cart_items = cart_checker.get_cart_items(request)
         order_items = [OrderItem(order=order, item=item, quantity=quantity) for
@@ -254,15 +244,23 @@ class CheckoutView(APIView):
         request.session['cart'] = {}
         request.session.modified = True
 
-        send_email_message.apply_async(kwargs={
-            'order_id': order.id,
-            'order_item_ids': [order_item.id for order_item in order_items],
-            'recipient_type': 'admin'})
-
-        send_email_message.apply_async(kwargs={
-            'order_id': order.id,
-            'order_item_ids': [order_item.id for order_item in order_items],
-            'recipient_type': 'customer'})
+        self.order_email(order, order_items)
 
         return Response({'message': 'Заказ успешно оформлен'},
                         status.HTTP_201_CREATED)
+
+    @staticmethod
+    def order_email(order, order_items):
+        """Отправка сообщения о новом заказе покупателю и админу."""
+
+        send_email_message.apply_async(kwargs={
+            'order_id': order.id,
+            'order_item_ids': [order_item.id for order_item in order_items],
+            'recipient_type': 'admin'
+        })
+
+        send_email_message.apply_async(kwargs={
+            'order_id': order.id,
+            'order_item_ids': [order_item.id for order_item in order_items],
+            'recipient_type': 'customer'
+        })

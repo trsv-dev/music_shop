@@ -52,8 +52,8 @@ class ItemsInLine(admin.TabularInline):
     def show_image_preview(self, obj):
         """Показать превью изображения товара в заказе."""
 
-        # Получаем контекст администратора благодаря переопределенному
-        # 'get_queryset'
+        # Получаем 'request' администратора благодаря переопределенному
+        # 'get_queryset'.
         request = self.request
         show_preview = request.session.get('show_preview', False)
         if show_preview:

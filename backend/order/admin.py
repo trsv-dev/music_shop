@@ -1,5 +1,7 @@
+from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.db import models
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 
@@ -52,8 +54,8 @@ class ItemsInLine(admin.TabularInline):
     def show_image_preview(self, obj):
         """Показать превью изображения товара в заказе."""
 
-        # Получаем контекст администратора благодаря переопределенному
-        # 'get_queryset'
+        # Получаем 'request' администратора благодаря переопределенному
+        # 'get_queryset'.
         request = self.request
         show_preview = request.session.get('show_preview', False)
         if show_preview:
@@ -86,6 +88,10 @@ class OrderAdmin(admin.ModelAdmin):
         ItemsInLine,
     )
     list_per_page = 25
+    # "Уменьшаем" размер текстовых полей.
+    formfield_overrides = {
+        models.TextField: {'widget': forms.Textarea(attrs={'rows': 3})},
+    }
 
     def total_price(self, obj):
         """Отображение полной стоимости заказа."""

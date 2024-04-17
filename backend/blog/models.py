@@ -1,5 +1,6 @@
 from django.core.validators import RegexValidator
 from django.db import models
+from tinymce.models import HTMLField
 
 
 class Blog(models.Model):
@@ -25,7 +26,7 @@ class Blog(models.Model):
         ),
         verbose_name='Слаг'
     )
-    text = models.TextField(
+    text = HTMLField(
         null=False,
         blank=False,
         verbose_name='Текст записи',

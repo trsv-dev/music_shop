@@ -31,8 +31,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'django_filters',
+    'tinymce',
     'debug_toolbar',
-    'drf_yasg',
 
     'item.apps.ItemConfig',
     'category.apps.CategoryConfig',
@@ -153,6 +154,7 @@ DESCRIPTION_LENGHT = int(os.getenv('DESCRIPTION_LENGHT', 50))
 SHORT_DESCRIPTION_LENGHT = int(os.getenv('SHORT_DESCRIPTION_LENGHT', 50))
 BLOG_TEXT_LENGHT = int(os.getenv('BLOG_TEXT_LENGHT', 150))
 ORDER_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
+ADMIN_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@email.xoxo')
 
 # Sending emails via Yandex mail (Don't work on pythonanywhere.com)
@@ -174,6 +176,7 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
 
 # Celery settings
 ###############################################################################
+
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND',
                                   'redis://127.0.0.1:6379/0')
@@ -184,4 +187,25 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = os.getenv(
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'priority_steps': list(range(10)),
     'queue_order_strategy': 'priority',
+}
+
+# TinyMCE settings
+###############################################################################
+
+TINYMCE_JS_URL = os.path.join(STATIC_URL, "tinymce/tinymce.min.js")
+TINYMCE_COMPRESSOR = False
+
+TINYMCE_DEFAULT_CONFIG = {
+    "height": "520px",
+    "menubar": "file edit view insert format tools table help",
+    "plugins": 'anchor autolink charmap codesample emoticons image link lists '
+               'media searchreplace table visualblocks wordcount fullscreen '
+               'pagebreak help',
+    "toolbar": 'undo redo blocks fontfamily fontsize '
+               'bold italic underline strikethrough blockquote '
+               'link image media forecolor backcolor table align lineheight '
+               'checklist numlist bullist indent outdent emoticons charmap '
+               'removeformat ',
+    "toolbar_mode": 'sliding',
+    "custom_undo_redo_levels": 15,
 }

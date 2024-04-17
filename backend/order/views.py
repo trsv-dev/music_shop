@@ -16,23 +16,15 @@ class CartChecker:
     """Класс проверок для корзины."""
 
     def get_cart(self, request):
-        """Получение корзины."""
+        """
+        Получение корзины если она есть в запросе или
+        создание пустой корзины, если корзины в запросе нет.
+        """
 
-        # try:
-        #     cart = request.session['cart']
-        #     return cart
-        # except KeyError:
-        #     raise SuspiciousOperation('Корзина не найдена')
-
-        if not request.session.get('cart'):
-            cart = {}
-            request.session['cart'] = cart
-
-            return cart
-        return request.session['cart']
+        return request.session.get('cart', {})
 
     def get_cart_items(self, request):
-        """Получение товаров, имеющий такой же id, как ключи корзины."""
+        """Получение товаров, имеющих такой же id, как ключи корзины."""
 
         cart = self.get_cart(request)
 
@@ -83,8 +75,7 @@ class CartView(APIView):
         cart = cart_checker.del_unexisting_items_and_zeros_quantities(request)
 
         if not cart or all(quantity == 0 for quantity in cart.values()):
-            return Response({'message': 'Корзина пуста'},
-                            status.HTTP_204_NO_CONTENT)
+            return Response({'message': 'Корзина пуста'}, status.HTTP_200_OK)
 
         item_ids = sorted([int(item_id) for item_id in cart.keys()])
 
@@ -218,7 +209,7 @@ class DeleteCartView(APIView):
                             status.HTTP_200_OK)
 
         return Response({'message': 'Корзина пуста'},
-                        status.HTTP_204_NO_CONTENT)
+                        status.HTTP_200_OK)
 
 
 class CheckoutView(APIView):
@@ -241,17 +232,7 @@ class CheckoutView(APIView):
 
         serializer = OrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        order = Order(
-            first_name=serializer.validated_data.get('first_name'),
-            last_name=serializer.validated_data.get('last_name'),
-            address=serializer.validated_data.get('address'),
-            email=serializer.validated_data.get('email'),
-            communication_method=serializer.validated_data.get(
-                'communication_method'),
-            order_notes=serializer.validated_data.get('order_notes')
-        )
-        order.save()
+        order = serializer.save()
 
         cart_items = cart_checker.get_cart_items(request)
         order_items = [OrderItem(order=order, item=item, quantity=quantity) for
@@ -263,15 +244,23 @@ class CheckoutView(APIView):
         request.session['cart'] = {}
         request.session.modified = True
 
-        send_email_message.apply_async(kwargs={
-            'order_id': order.id,
-            'order_item_ids': [order_item.id for order_item in order_items],
-            'recipient_type': 'admin'})
-
-        send_email_message.apply_async(kwargs={
-            'order_id': order.id,
-            'order_item_ids': [order_item.id for order_item in order_items],
-            'recipient_type': 'customer'})
+        self.order_email(order, order_items)
 
         return Response({'message': 'Заказ успешно оформлен'},
                         status.HTTP_201_CREATED)
+
+    @staticmethod
+    def order_email(order, order_items):
+        """Отправка сообщения о новом заказе покупателю и админу."""
+
+        send_email_message.apply_async(kwargs={
+            'order_id': order.id,
+            'order_item_ids': [order_item.id for order_item in order_items],
+            'recipient_type': 'admin'
+        })
+
+        send_email_message.apply_async(kwargs={
+            'order_id': order.id,
+            'order_item_ids': [order_item.id for order_item in order_items],
+            'recipient_type': 'customer'
+        })

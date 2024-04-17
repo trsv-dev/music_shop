@@ -1,4 +1,6 @@
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
+from rest_framework.pagination import PageNumberPagination
 
 from api.serializers import ItemsSerializer, BlogSerializer, CategorySerializer
 from blog.models import Blog
@@ -12,14 +14,23 @@ class ItemsViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.filter(is_published=True).prefetch_related('tags')
     serializer_class = ItemsSerializer
     http_method_names = ['get']
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,
+                       filters.OrderingFilter)
+    ordering_fields = ('price', 'discount_price')
+    filterset_fields = ('is_discount', 'is_special_offer')
+    search_fields = ('^name',)
 
 
 class BlogViewSet(viewsets.ModelViewSet):
     """Вьюсет записей в блоге."""
 
-    queryset = Blog.objects.filter(is_published=True)
+    queryset = Blog.objects.filter(is_published=True).order_by('-id')
     serializer_class = BlogSerializer
     http_method_names = ['get']
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('^title',)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

@@ -2,7 +2,9 @@ from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from import_export.admin import ImportExportModelAdmin, ExportActionMixin
 
+from api.resources import ItemResource
 from item.models import Item
 
 admin.site.site_header = "Магазин музыкальных инструментов"
@@ -11,9 +13,11 @@ admin.site.index_title = "Добро пожаловать магазин муз�
 
 
 @admin.register(Item)
-class ItemAdmin(admin.ModelAdmin):
+# class ItemAdmin(admin.ModelAdmin):
+class ItemAdmin(ImportExportModelAdmin, ExportActionMixin):
     """Класс администрирования товаров."""
 
+    resource_class = ItemResource
     fields = ('name', 'short_description', 'description', 'category', 'tags',
               'image', 'show_image_preview', 'is_special_offer', 'price',
               'is_discount', 'discount_price', 'is_published', 'is_on_main')

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django_filters',
     'tinymce',
     'debug_toolbar',
+    'import_export',
 
     'item.apps.ItemConfig',
     'category.apps.CategoryConfig',
@@ -156,6 +157,12 @@ BLOG_TEXT_LENGHT = int(os.getenv('BLOG_TEXT_LENGHT', 150))
 ORDER_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
 ADMIN_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@email.xoxo')
+
+
+# Import/Export settings
+###############################################################################
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
 
 # Sending emails via Yandex mail (Don't work on pythonanywhere.com)
 ###############################################################################

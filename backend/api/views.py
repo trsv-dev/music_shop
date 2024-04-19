@@ -36,7 +36,7 @@ class BlogViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     """Вьюсет для категорий товаров."""
 
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('-id')
     serializer_class = CategorySerializer
     http_method_names = ['get']
 

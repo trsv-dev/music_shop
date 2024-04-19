@@ -113,11 +113,14 @@ class Order(models.Model):
         if self.pk:
             original_order = Order.objects.get(pk=self.pk)
             if original_order.status != self.status:
-                send_email_message.apply_async(kwargs={
-                    'order_id': self.pk,
-                    'order_item_ids': None,
-                    'recipient_type': 'status_changed'
-                })
+                send_email_message.apply_async(
+                    kwargs={
+                        'order_id': self.pk,
+                        'order_item_ids': None,
+                        'recipient_type': 'status_changed'
+                    },
+                    countdown=10
+                )
 
         # Присваиваем заказу уникальный идентификатор новому заказу.
         if not self.order_number:

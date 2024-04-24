@@ -1,4 +1,3 @@
-from django.core.exceptions import SuspiciousOperation
 from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.generics import get_object_or_404
@@ -129,6 +128,7 @@ class AddToCartView(APIView):
         quantity = serializer.validated_data.get('quantity', 1)
 
         item = get_object_or_404(Item, id=item_id)
+        image = item.image.url if item.image else None
 
         if str(item.id) in cart.keys() and cart[str(item_id)] > 0:
             return Response(
@@ -143,6 +143,7 @@ class AddToCartView(APIView):
             'item': {
                 'id': item.id,
                 'name': item.name,
+                'image': image,
                 'quantity': quantity,
                 'price': item.price,
                 'total_price': item.price * quantity if item.price else
@@ -253,14 +254,20 @@ class CheckoutView(APIView):
     def order_email(order, order_items):
         """Отправка сообщения о новом заказе покупателю и админу."""
 
-        send_email_message.apply_async(kwargs={
-            'order_id': order.id,
-            'order_item_ids': [order_item.id for order_item in order_items],
-            'recipient_type': 'admin'
-        })
+        send_email_message.apply_async(
+            kwargs={
+                'order_id': order.id,
+                'order_item_ids': [order_item.id for order_item in order_items],
+                'recipient_type': 'admin'
+            },
+            countdown=10
+        )
 
-        send_email_message.apply_async(kwargs={
-            'order_id': order.id,
-            'order_item_ids': [order_item.id for order_item in order_items],
-            'recipient_type': 'customer'
-        })
+        send_email_message.apply_async(
+            kwargs={
+                'order_id': order.id,
+                'order_item_ids': [order_item.id for order_item in order_items],
+                'recipient_type': 'customer'
+            },
+            countdown=10
+        )

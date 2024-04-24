@@ -59,8 +59,8 @@ class Item(models.Model):
     price = models.IntegerField(
         blank=False,
         null=False,
-        verbose_name='Цена без акции',
-        help_text='Введите цену без акции'
+        verbose_name='Цена без распродажи',
+        help_text='Введите цену без распродажи'
     )
     is_discount = models.BooleanField(
         default=False,
@@ -75,8 +75,8 @@ class Item(models.Model):
         default=0,
         blank=True,
         null=True,
-        verbose_name='Акционная цена',
-        help_text='Введите цену по акции'
+        verbose_name='Цена при распродаже',
+        help_text='Введите цену при распродаже'
     )
     add_date = models.DateTimeField(
         auto_now_add=True,

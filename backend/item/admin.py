@@ -72,15 +72,15 @@ class ItemAdmin(ImportExportModelAdmin, ExportActionMixin):
 
         return f'{obj.price:,} руб.'
 
-    show_price.short_description = 'Цена без акции'
+    show_price.short_description = 'Цена без распродажи'
     show_price.admin_order_field = 'price'
 
     def show_discount_price(self, obj):
-        """Отображение акционной цены с разделителями."""
+        """Отображение цены при распродаже с разделителями."""
 
         return f'{obj.discount_price:,} руб.' if obj.discount_price else f'{0} руб.'
 
-    show_discount_price.short_description = 'Цена по акции'
+    show_discount_price.short_description = 'Цена при распродаже'
     show_discount_price.admin_order_field = 'discount_price'
 
     def show_image(self, obj):

@@ -21,6 +21,18 @@ class ItemsViewSet(viewsets.ModelViewSet):
     filterset_fields = ('is_discount', 'is_special_offer')
     search_fields = ('^name',)
 
+    def get_queryset(self):
+        """Переопределяем получение queryset на случай фильтрации по тегам."""
+
+        queryset = super().get_queryset()
+        tags = self.request.query_params.get('tags', False)
+
+        if tags:
+            tags_list = tags.split(', ')
+            queryset = Item.objects.filter(tags__name__in=tags_list)
+
+        return queryset
+
 
 class BlogViewSet(viewsets.ModelViewSet):
     """Вьюсет записей в блоге."""

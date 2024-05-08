@@ -1,5 +1,7 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
+from api.resources import TagsResource
 from tags.models import ItemTag, Tags
 
 
@@ -10,9 +12,11 @@ from tags.models import ItemTag, Tags
 
 
 @admin.register(Tags)
-class TagsAdmin(admin.ModelAdmin):
+# class TagsAdmin(admin.ModelAdmin):
+class TagsAdmin(ImportExportModelAdmin):
     """Класс администрирования тегов."""
 
+    resource_class = TagsResource
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     list_per_page = 25

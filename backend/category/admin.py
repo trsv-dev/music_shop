@@ -1,20 +1,24 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from import_export.admin import ImportExportModelAdmin
 
+from api.resources import CategoryResource
 from category.models import Category
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+# class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(ImportExportModelAdmin):
     """Класс администрирования категорий."""
 
+    resource_class = CategoryResource
     fields = ('name', 'slug', 'short_description', 'image',
               'show_image_preview')
     list_display = ('name', 'slug', 'short_description', 'show_image')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name', 'slug', 'short_description')
     readonly_fields = ('show_image_preview',)
-    ordering = ('name',)
+    ordering = ('-id',)
     list_per_page = 25
 
     def show_image(self, obj):

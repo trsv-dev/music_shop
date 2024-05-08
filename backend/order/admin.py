@@ -1,9 +1,25 @@
+from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.db import models
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
+from import_export.admin import ImportExportModelAdmin, ExportActionMixin
 
+from api.resources import OrderResource
 from order.models import Order, OrderItem
+
+
+class ExportOnlyAdmin(ImportExportModelAdmin):
+    """
+    Для наследования OrderAdmin для отключения импорта данных.
+    Класс административной панели, позволяющий только экспорт данных.
+    """
+
+    def has_import_permission(self, request):
+        """Переопределение метода, запрещающего импорт данных."""
+
+        return False
 
 
 class ItemsInLine(admin.TabularInline):
@@ -69,9 +85,10 @@ class ItemsInLine(admin.TabularInline):
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ExportOnlyAdmin, ExportActionMixin):
     """Класс администрирования заказов."""
 
+    resource_class = OrderResource
     list_display = ('id', 'order_number', 'status', 'first_name', 'last_name',
                     'total_price', 'email',
                     'show_items_quantity_in_cart',
@@ -86,6 +103,21 @@ class OrderAdmin(admin.ModelAdmin):
         ItemsInLine,
     )
     list_per_page = 25
+    # "Уменьшаем" размер текстовых полей.
+    formfield_overrides = {
+        models.TextField: {'widget': forms.Textarea(attrs={'rows': 3})},
+    }
+
+    def get_queryset(self, request):
+        """
+        Переопределяем набор данных при экспорте, присоединяя
+        к выборке 'items'.
+        """
+
+        queryset = super().get_queryset(request)
+        queryset = queryset.prefetch_related('orderitem_set__item')
+
+        return queryset
 
     def total_price(self, obj):
         """Отображение полной стоимости заказа."""

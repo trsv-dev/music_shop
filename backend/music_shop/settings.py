@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django_filters',
     'tinymce',
     'debug_toolbar',
+    'import_export',
 
     'item.apps.ItemConfig',
     'category.apps.CategoryConfig',
@@ -76,8 +77,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'music_shop.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+# SQLite's settings (for local development):
+##############################################################################
 
 DATABASES = {
     'default': {
@@ -85,6 +86,20 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# PostgreSQL's settings (for production or locally in containers):
+###############################################################################
+
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.getenv('POSTGRES_DB', 'django'),
+#        'USER': os.getenv('POSTGRES_USER', 'django'),
+#        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'you_need_to_set_the_password_in_env'),
+#        'HOST': os.getenv('DB_HOST', 'localhost'),
+#        'PORT': os.getenv('DB_PORT', 5432)
+#    }
+# }
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -157,6 +172,12 @@ ORDER_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
 ADMIN_NOTES_LENGHT = int(os.getenv('ORDER_NOTES_LENGHT', 50))
 ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@email.xoxo')
 
+
+# Import/Export settings
+###############################################################################
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+
 # Sending emails via Yandex mail (Don't work on pythonanywhere.com)
 ###############################################################################
 
@@ -184,10 +205,6 @@ CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND',
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = os.getenv(
     'CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP', 'True') == 'True'
 
-CELERY_BROKER_TRANSPORT_OPTIONS = {
-    'priority_steps': list(range(10)),
-    'queue_order_strategy': 'priority',
-}
 
 # TinyMCE settings
 ###############################################################################

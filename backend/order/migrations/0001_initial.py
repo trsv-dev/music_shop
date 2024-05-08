@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Order',
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('first_name', models.CharField(help_text='Введите имя', max_length=255, verbose_name='Имя')),
                 ('last_name', models.CharField(help_text='Введите фамилию', max_length=255, verbose_name='Фамилия')),
                 ('address', models.CharField(help_text='Введите ваш адрес в формате (город, улица, дом, корпус, квартира)', max_length=255, verbose_name='Укажите свой адрес')),

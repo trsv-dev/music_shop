@@ -165,3 +165,12 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.item.category}, количество: {self.quantity}'
+
+
+# from django.dispatch import receiver
+# from django.db.models.signals import post_save
+#
+#
+# @receiver(post_save, sender=Order)
+# def order_created_handler(*args, **kwargs):
+#     print(args, kwargs)

@@ -27,7 +27,8 @@ class ItemsInLine(admin.TabularInline):
 
     model = OrderItem
     extra = 0
-    ordering = ('id',)
+    # ordering = ('id',)
+    # ordering = ('item__category__name', 'item__name')
     readonly_fields = ('show_image_preview', 'price_per_item',
                        'price_for_all_items',)
 

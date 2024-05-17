@@ -28,7 +28,8 @@ class ItemAdmin(ImportExportModelAdmin, ExportActionMixin):
                     'is_published', 'is_on_main')
     readonly_fields = ('show_image_preview',)
     list_filter = ('is_published', 'is_discount', 'is_special_offer')
-    ordering = ('-add_date',)
+    # ordering = ('-add_date',)
+    ordering = ('category__name', 'name',)
     search_fields = ('name', 'description')
     list_per_page = 25
 

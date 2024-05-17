@@ -107,4 +107,4 @@ class Item(models.Model):
         ordering = ('-add_date',)
 
     def __str__(self):
-        return self.name
+        return f'{self.category} 🡢 {self.name}'

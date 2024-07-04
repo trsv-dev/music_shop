@@ -8,7 +8,7 @@ volumes:
 
 services:
   backend:
-    container_name: backend
+    container_name: music_shop_backend
     build: ./backend/
     command: |
       bash -c 'gunicorn --bind 0:10000 music_shop.wsgi'
@@ -22,7 +22,7 @@ services:
       - redis
 
   postgres:
-    container_name: postgres
+    container_name: music_shop_postgres
     image: postgres:16-alpine
     env_file:
       - .env
@@ -30,7 +30,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   nginx:
-    container_name: nginx
+    container_name: music_shop_nginx
     build: ./gateway/
     volumes:
       - static:/app/static/
@@ -42,7 +42,7 @@ services:
         condition: service_started
 
   redis:
-    container_name: redis
+    container_name: music_shop_redis
     image: redis:7.2-alpine
     env_file:
       - .env
@@ -50,7 +50,7 @@ services:
       - redis_data:/data
 
   flower:
-    container_name: flower
+    container_name: music_shop_flower
     image: mher/flower:2.0.0
     env_file:
       - .env
@@ -67,7 +67,7 @@ services:
     restart: always
 
   celery_worker_queue:
-    container_name: celery_worker_queue
+    container_name: music_shop_celery_worker_queue
     build: ./backend/
     env_file:
       - .env

@@ -35,6 +35,14 @@
 - Возможность импортировать и экспортировать теги, категории, товары 
 (без изображений), импортировать заказы.
 
+Демо: http://music-shop.trsv-dev.ru/api/v1/
+
+Админка: http://music-shop.trsv-dev.ru/admin/ (admin / MySuperStrongPassword)
+
+Flower: http://music-shop.trsv-dev.ru:5555 (admin / MySuperStrongPassword)
+
+[Документация](https://documenter.getpostman.com/view/26097853/2sA3JGgPwv)
+
 ## Стек технологий:
 * celery==5.3.6
 * Django==4.2.11
@@ -259,6 +267,12 @@ DATABASES = {
        'PORT': os.getenv('DB_PORT', 5432)
    }
 }
+```
+Если запускаете на продакшне, то не забудьте раскомментировать в .env строку 
+ниже и внести туда адрес своего домена:
+
+```
+CSRF_TRUSTED_ORIGINS=https://your_domain.com
 ```
 
 Запустите контейнер в фоновом режиме:
